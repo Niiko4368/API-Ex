@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Odds &amp; Ends: facts, jokes and poems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --page: #ebe9f5;
+    --ink: #1d1b3a;
+    --fact: #f6c744;
+    --joke: #ff8fa3;
+    --poem: #2c2a6e;
+    --poem-ink: #f1efff;
+    --btn: #1d1b3a;
+    --btn-ink: #ffffff;
+    --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    box-sizing: border-box;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --page: #14132b; --ink: #f1efff; }
+  }
+  * { box-sizing: inherit; }
+  html { background: var(--page); }
+  body {
+    margin: 0; padding: 32px 20px 64px;
+    background: var(--page); color: var(--ink);
+    font-family: var(--sans); line-height: 1.5;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  h1 {
+    font-size: clamp(2.6rem, 9vw, 6rem); line-height: .95; margin: 0 0 12px;
+    font-weight: 800; letter-spacing: -0.03em;
+  }
+  .lede { margin: 0 0 36px; max-width: 46ch; font-size: 1.1rem; }
+
+  .grid { display: grid; gap: 20px; grid-template-columns: 1fr 1fr; }
+  .panel {
+    border-radius: 28px; padding: 28px; display: flex; flex-direction: column;
+    gap: 16px; min-height: 320px; color: #1d1b3a;
+  }
+  .fact { background: var(--fact); }
+  .joke { background: var(--joke); }
+  .poem { background: var(--poem); color: var(--poem-ink); grid-column: 1 / -1; min-height: 360px; }
+  h2 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.01em; }
+  .out { flex: 1; font-size: 1.3rem; line-height: 1.35; font-weight: 700; }
+  .out .sub { font-weight: 400; font-size: 1rem; margin-top: 10px; opacity: .8; }
+  .out.err { font-weight: 400; font-size: 1rem; }
+  .poem .out { font-family: var(--serif); font-weight: 400; font-size: 1.15rem; line-height: 1.6; max-height: 420px; overflow-y: auto; }
+  .poem .title { font-size: 1.8rem; font-style: italic; margin: 0 0 2px; }
+  .poem .by { opacity: .75; margin: 0 0 16px; font-family: var(--sans); font-size: .95rem; }
+  .poem .lines { white-space: pre-line; max-width: 60ch; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  button, select, input {
+    font: inherit; border-radius: 999px; border: 2px solid currentColor;
+    padding: 10px 18px; background: transparent; color: inherit;
+  }
+  button { background: var(--btn); color: var(--btn-ink); border-color: var(--btn); font-weight: 700; cursor: pointer; }
+  .poem button { background: var(--poem-ink); color: var(--poem); border-color: var(--poem-ink); }
+  button.ghost { background: transparent; color: inherit; border-color: currentColor; }
+  button:disabled { opacity: .5; cursor: wait; }
+  input { min-width: 0; flex: 1 1 200px; }
+  input::placeholder { color: inherit; opacity: .6; }
+  label.chk { display: inline-flex; gap: 8px; align-items: center; }
+  label.chk input { flex: none; width: 18px; height: 18px; padding: 0; accent-color: #1d1b3a; }
+  :focus-visible { outline: 3px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 5px #1d1b3a; }
+
+  footer { margin-top: 28px; font-size: .9rem; opacity: .8; }
+  footer a { color: inherit; }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    .panel { padding: 22px; border-radius: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Odds &amp; ends</h1>
+  <p class="lede">A useless fact, a bad joke and a public-domain poem. Press a button for another.</p>
+
+  <div class="grid">
+    <section class="panel fact" aria-labelledby="fact-h">
+      <h2 id="fact-h">Useless fact</h2>
+      <div class="out" id="fact-out" aria-live="polite">Loading…</div>
+      <div class="row">
+        <button id="fact-new">New fact</button>
+        <button id="fact-today" class="ghost">Fact of the day</button>
+        <select id="fact-lang" aria-label="Fact language">
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="panel joke" aria-labelledby="joke-h">
+      <h2 id="joke-h">Joke</h2>
+      <div class="out" id="joke-out" aria-live="polite">Loading…</div>
+      <div class="row">
+        <button id="joke-new">New joke</button>
+        <button id="joke-reveal" class="ghost" hidden>Show punchline</button>
+        <label class="chk"><input type="checkbox" id="joke-safe" checked> Safe mode</label>
+      </div>
+    </section>
+
+    <section class="panel poem" aria-labelledby="poem-h">
+      <h2 id="poem-h">Poem</h2>
+      <div class="out" id="poem-out" aria-live="polite">Loading…</div>
+      <div class="row">
+        <button id="poem-random">Random poem</button>
+        <input id="poem-author" list="authors" placeholder="Search by poet, e.g. Dickinson" aria-label="Poet name">
+        <datalist id="authors"></datalist>
+        <button id="poem-search" class="ghost">Find a poem</button>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    Data from
+    <a href="https://uselessfacts.jsph.pl/">Useless Facts</a>,
+    <a href="https://v2.jokeapi.dev/">JokeAPI</a> and
+    <a href="https://github.com/thundercomb/poetrydb#readme">PoetryDB</a>.
+  </footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+async function getJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("The service answered with status " + res.status + ".");
+  return res.json();
+}
+
+// Wraps a loader: disables its buttons, shows a message on failure.
+async function run(outEl, buttons, task) {
+  buttons.forEach((b) => (b.disabled = true));
+  try {
+    await task();
+    outEl.classList.remove("err");
+  } catch (e) {
+    outEl.classList.add("err");
+    outEl.textContent = "Couldn’t load this. " + e.message + " Check your connection and try again.";
+  } finally {
+    buttons.forEach((b) => (b.disabled = false));
+  }
+}
+
+/* ---------- Useless facts ---------- */
+const factOut = $("fact-out");
+const factBtns = [$("fact-new"), $("fact-today")];
+
+function loadFact(today) {
+  const url = today
+    ? "https://uselessfacts.jsph.pl/api/v2/facts/today"
+    : "https://uselessfacts.jsph.pl/api/v2/facts/random?language=" + $("fact-lang").value;
+  return run(factOut, factBtns, async () => {
+    const d = await getJSON(url);
+    factOut.textContent = d.text;
+    if (today) {
+      const sub = document.createElement("div");
+      sub.className = "sub";
+      sub.textContent = "Today’s fact";
+      factOut.appendChild(sub);
+    }
+  });
+}
+$("fact-new").onclick = () => loadFact(false);
+$("fact-today").onclick = () => loadFact(true);
+$("fact-lang").onchange = () => loadFact(false);
+
+/* ---------- Jokes ---------- */
+const jokeOut = $("joke-out");
+const jokeBtns = [$("joke-new")];
+const revealBtn = $("joke-reveal");
+let punchline = "";
+
+function loadJoke() {
+  revealBtn.hidden = true;
+  const url = "https://v2.jokeapi.dev/joke/Any" + ($("joke-safe").checked ? "?safe-mode" : "");
+  return run(jokeOut, jokeBtns, async () => {
+    const d = await getJSON(url);
+    if (d.error) throw new Error(d.message || "No joke came back.");
+    if (d.type === "twopart") {
+      jokeOut.textContent = d.setup;
+      punchline = d.delivery;
+      revealBtn.hidden = false;
+    } else {
+      jokeOut.textContent = d.joke;
+    }
+  });
+}
+revealBtn.onclick = () => {
+  const p = document.createElement("div");
+  p.className = "sub";
+  p.style.fontWeight = "700";
+  p.style.opacity = "1";
+  p.textContent = punchline;
+  jokeOut.appendChild(p);
+  revealBtn.hidden = true;
+};
+$("joke-new").onclick = loadJoke;
+$("joke-safe").onchange = loadJoke;
+
+/* ---------- Poems ---------- */
+const poemOut = $("poem-out");
+const poemBtns = [$("poem-random"), $("poem-search")];
+
+function showPoem(p) {
+  poemOut.textContent = "";
+  const t = document.createElement("h3");
+  t.className = "title"; t.style.fontWeight = "400"; t.style.margin = "0 0 2px";
+  t.textContent = p.title;
+  const by = document.createElement("p");
+  by.className = "by"; by.textContent = "by " + p.author;
+  const body = document.createElement("div");
+  body.className = "lines"; body.textContent = p.lines.join("\n");
+  poemOut.append(t, by, body);
+  poemOut.scrollTop = 0;
+}
+
+function loadPoem(author) {
+  const url = author
+    ? "https://poetrydb.org/author/" + encodeURIComponent(author)
+    : "https://poetrydb.org/random";
+  return run(poemOut, poemBtns, async () => {
+    const d = await getJSON(url);
+    if (!Array.isArray(d) || d.length === 0) {
+      throw new Error("No poems found for “" + author + "”. Try a surname like Keats or Dickinson.");
+    }
+    showPoem(d[Math.floor(Math.random() * d.length)]);
+  });
+}
+$("poem-random").onclick = () => loadPoem("");
+$("poem-search").onclick = () => loadPoem($("poem-author").value.trim());
+$("poem-author").onkeydown = (e) => { if (e.key === "Enter") $("poem-search").click(); };
+
+// Poet suggestions for the search box (optional; ignore failures)
+getJSON("https://poetrydb.org/author").then((d) => {
+  const list = $("authors");
+  (d.authors || []).forEach((a) => {
+    const o = document.createElement("option");
+    o.value = a;
+    list.appendChild(o);
+  });
+}).catch(() => {});
+
+/* ---------- Start ---------- */
+loadFact(false);
+loadJoke();
+loadPoem("");
+</script>
+</body>
+</html>
